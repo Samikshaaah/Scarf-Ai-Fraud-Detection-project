@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCARF Fraud Detection Lab</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: white;
+    background: #0a0e1a;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+    z-index: -2;
+}
+
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.container {
+    padding: 40px 20px;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 50px 30px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.header h1 {
+    font-size: 3.5em;
+    font-weight: 800;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+}
+
+.header p {
+    font-size: 1.3em;
+    opacity: 0.8;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+}
+
+.card {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 35px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.card h3 {
+    margin-bottom: 25px;
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.upload-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+input[type="file"] {
+    flex: 1;
+    padding: 16px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 2px dashed rgba(59, 130, 246, 0.5);
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    margin-right: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+}
+
+input[type="file"]:hover {
+    border-color: #60a5fa;
+    background: rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+button {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 12px;
+    font-size: 1em;
+    font-weight: 700;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6);
+}
+
+button:active {
+    transform: translateY(-1px);
+}
+
+.progress {
+    height: 28px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 14px;
+    margin-top: 25px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    position: relative;
+}
+
+.progress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+#bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #10b981 100%);
+    border-radius: 14px;
+    transition: width 0.3s;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+#bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: barShine 1.5s infinite;
+}
+
+@keyframes barShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+#status {
+    margin-top: 20px;
+    font-size: 1.1em;
+    padding: 18px 20px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 12px;
+    border-left: 4px solid #3b82f6;
+    font-weight: 600;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    padding: 25px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+.stat-box:hover::before {
+    opacity: 1;
+}
+
+.stat-box h4 {
+    font-size: 0.85em;
+    color: #94a3b8;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-box p {
+    font-size: 2.5em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+}
+
+table {
+    width: 100%;
+    margin-top: 25px;
+    border-collapse: collapse;
+    background: rgba(30, 41, 59, 0.4);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+th, td {
+    padding: 18px;
+    text-align: center;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+th {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+    font-weight: 700;
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9em;
+}
+
+td {
+    font-weight: 500;
+}
+
+tr {
+    transition: all 0.3s;
+}
+
+tr:hover {
+    background: rgba(59, 130, 246, 0.15);
+    transform: scale(1.01);
+}
+
+.chart-container {
+    position: relative;
+    height: 350px;
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.obs-panel {
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 4px 8px 10px 8px;
+    text-align: left;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity:0; transform: translateY(-6px); }
+    to   { opacity:1; transform: translateY(0); }
+}
+
+.obs-panel .risk-badge {
+    font-size: 1em;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.obs-panel .obs-summary {
+    color: #fca5a5;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+}
+
+.obs-flag {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    background: rgba(239,68,68,0.1);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 0.88em;
+}
+
+.obs-flag .flag-icon { font-size: 1.1em; }
+.obs-flag .flag-text { color: #fecaca; line-height: 1.5; }
+.obs-flag .flag-dev  { margin-left: auto; color: #f87171; font-weight: 700; white-space: nowrap; }
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2em;
+    }
+    
+    .upload-section {
+        flex-direction: column;
+    }
+    
+    input[type="file"], button {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="particles-js"></div>
+
+<div class="container">
+
+<div class="header">
+    <h1>🔍 SCARF Fraud Detection</h1>
+    <p>Self-Supervised Contrastive Learning for Fraud Detection</p>
+</div>
+
+<div class="card">
+    <h3>📁 Upload & Train</h3>
+    <div class="upload-section">
+        <input type="file" id="fileInput" accept=".csv">
+        <button type="button" id="trainBtn">🎯 Start Training</button>
+    </div>
+
+    <div class="progress">
+        <div id="bar"></div>
+    </div>
+
+    <p id="status">⏳ Waiting for training...</p>
+    
+    <div class="stats-grid" id="statsGrid" style="display:none;">
+        <div class="stat-box"><h4>SCARF Accuracy</h4><p id="scarfAcc">-</p></div>
+        <div class="stat-box"><h4>SCARF Precision</h4><p id="scarfPrec">-</p></div>
+        <div class="stat-box"><h4>SCARF Recall</h4><p id="scarfRec">-</p></div>
+        <div class="stat-box"><h4>SCARF F1</h4><p id="scarfF1">-</p></div>
+        <div class="stat-box"><h4>SCARF AUC</h4><p id="scarfAuc">-</p></div>
+        <div class="stat-box"><h4>Baseline Accuracy</h4><p id="baselineAcc">-</p></div>
+        <div class="stat-box"><h4>Baseline F1</h4><p id="baselineF1">-</p></div>
+        <div class="stat-box"><h4>Baseline AUC</h4><p id="baselineAuc">-</p></div>
+        <div class="stat-box"><h4>Train Samples</h4><p id="trainSamples">-</p></div>
+        <div class="stat-box"><h4>Test Samples</h4><p id="testSamples">-</p></div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>📉 Real-time Loss Curve</h3>
+    <div class="chart-container">
+        <canvas id="lossChart"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <h3>📈 Accuracy Comparison</h3>
+    <div class="chart-container">
+        <canvas id="accuracyChart"></canvas>
+    </div>
+</div>
+
+<div class="card" id="fraudCheckCard">
+    <h3>🚨 Check Transactions for Fraud</h3>
+    <p style="color:#94a3b8; margin-bottom:20px; font-size:0.95em;">Upload a CSV of transactions (same columns as training data) to detect fraud row by row.</p>
+    <div class="upload-section">
+        <input type="file" id="predictFile" accept=".csv">
+        <button type="button" id="predictBtn">🔍 Check Fraud</button>
+    </div>
+    <p id="predictStatus" style="margin-top:16px; font-size:1em; padding:14px 18px; background:rgba(30,41,59,0.6); border-radius:10px; border-left:4px solid #8b5cf6; font-weight:600; display:none;"></p>
+
+    <div id="predictSummary" style="display:none; margin-top:20px;">
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="stat-box"><h4>Total Transactions</h4><p id="totalTx">-</p></div>
+            <div class="stat-box" style="border-color:rgba(239,68,68,0.4); background:linear-gradient(135deg,rgba(239,68,68,0.15) 0%,rgba(239,68,68,0.05) 100%)">
+                <h4>🚨 Fraud Detected</h4><p id="fraudCount" style="background:linear-gradient(135deg,#f87171,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">-</p>
+            </div>
+            <div class="stat-box" style="border-color:rgba(16,185,129,0.4); background:linear-gradient(135deg,rgba(16,185,129,0.15) 0%,rgba(16,185,129,0.05) 100%)">
+                <h4>✅ Legit</h4><p id="legitCount" style="background:linear-gradient(135deg,#34d399,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">-</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="predictTableWrap" style="display:none; margin-top:25px; max-height:500px; overflow-y:auto; border-radius:12px;">
+        <table id="predictTable"></table>
+    </div>
+</div>
+
+<div class="card">
+    <h3>📊 Experiment History</h3>
+    <button type="button" id="historyBtn">🔄 Load History</button>
+    <table id="historyTable"></table>
+</div>
+
+</div>
+
+<script>
+
+// Prevent any accidental navigation
+window.addEventListener('beforeunload', function(e) {
+    console.log('Page is trying to unload!');
+});
+
+// ---------------- PARTICLES ----------------
+
+particlesJS("particles-js", {
+  particles: {
+    number: { value: 80 },
+    size: { value: 3 },
+    move: { speed: 2 },
+    line_linked: { 
+        enable: true,
+        color: "#3b82f6",
+        opacity: 0.4
+    },
+    color: { value: "#3b82f6" },
+    opacity: { value: 0.5 }
+  }
+});
+
+// ---------------- LOSS CHART ----------------
+
+let lossChart = new Chart(document.getElementById("lossChart"), {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: "Training Loss",
+            data: [],
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            tension: 0.4,
+            fill: true,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        animation: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: { color: 'white' }
+            }
+        },
+        scales: {
+            x: { 
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            y: { 
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255,255,255,0.1)' }
+            }
+        }
+    }
+});
+
+// ---------------- ACCURACY LINE CHART ----------------
+
+let accuracyChart = new Chart(document.getElementById("accuracyChart"), {
+    type: 'bar',
+    data: {
+        labels: [],
+        datasets: [
+            {
+                label: "SCARF Accuracy (%)",
+                data: [],
+                backgroundColor: "rgba(59, 130, 246, 0.8)",
+                borderColor: "#3b82f6",
+                borderWidth: 2
+            },
+            {
+                label: "Baseline Accuracy (%)",
+                data: [],
+                backgroundColor: "rgba(139, 92, 246, 0.8)",
+                borderColor: "#8b5cf6",
+                borderWidth: 2
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: { color: 'white' }
+            }
+        },
+        scales: {
+            x: { 
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            y: { 
+                min: 0, 
+                max: 100,
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255,255,255,0.1)' }
+            }
+        }
+    }
+});
+
+// ---------------- TRAIN FUNCTION ----------------
+
+document.getElementById('trainBtn').addEventListener('click', train);
+
+async function train(e) {
+    if (e) e.preventDefault();
+
+    if (window.location.protocol === "file:") {
+        alert("Please open this page via http://127.0.0.1:8000/ (or another http:// URL) so the backend can be reached.");
+        return false;
+    }
+
+    const file = document.getElementById("fileInput").files[0];
+
+    if (!file) {
+        alert("Please select a CSV file first.");
+        return false;
+    }
+
+    document.getElementById("status").innerText = "🔄 Training started...";
+    document.getElementById("bar").style.width = "0%";
+    document.getElementById("statsGrid").style.display = "none";
+
+    lossChart.data.labels = [];
+    lossChart.data.datasets[0].data = [];
+    lossChart.update();
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+
+        const response = await fetch("http://127.0.0.1:8000/train/", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        let step = 0;
+        let progress = 0;
+        const totalSteps = 100;
+
+        while (true) {
+
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+
+            lines.forEach(line => {
+
+                if (line.startsWith("data: ")) {
+
+                    const data = line.replace("data: ", "").trim();
+
+                    if (data.startsWith("LOSS:")) {
+                        let loss = parseFloat(data.split(":")[1]);
+                        lossChart.data.labels.push(step++);
+                        lossChart.data.datasets[0].data.push(loss);
+                        lossChart.update('none');
+
+                        progress++;
+                        document.getElementById("bar").style.width =
+                            Math.min((progress / totalSteps) * 100, 100) + "%";
+                    }
+
+                    if (data.startsWith("DONE:")) {
+                        const parts = data.split(":");
+                        // DONE:scarfAcc:blAcc:trainN:testN:scarfPrec:scarfRec:scarfF1:scarfAuc:blPrec:blRec:blF1:blAuc
+                        const scarfAcc  = parseFloat(parts[1]) * 100;
+                        const blAcc     = parseFloat(parts[2]) * 100;
+                        const trainN    = parts[3];
+                        const testN     = parts[4];
+                        const scarfPrec = parseFloat(parts[5]) * 100;
+                        const scarfRec  = parseFloat(parts[6]) * 100;
+                        const scarfF1   = parseFloat(parts[7]) * 100;
+                        const scarfAuc  = parseFloat(parts[8]) * 100;
+                        const blF1      = parseFloat(parts[11]) * 100;
+                        const blAuc     = parseFloat(parts[12]) * 100;
+
+                        accuracyChart.data.labels.push("Run " + (accuracyChart.data.labels.length + 1));
+                        accuracyChart.data.datasets[0].data.push(scarfAcc);
+                        accuracyChart.data.datasets[1].data.push(blAcc);
+                        accuracyChart.update();
+
+                        document.getElementById("status").innerText =
+                            "✅ Done! SCARF F1: " + scarfF1.toFixed(2) + "% | AUC: " + scarfAuc.toFixed(2) + "%";
+                        document.getElementById("bar").style.width = "100%";
+                        document.getElementById("statsGrid").style.display = "grid";
+                        document.getElementById("scarfAcc").innerText  = scarfAcc.toFixed(2) + "%";
+                        document.getElementById("scarfPrec").innerText = scarfPrec.toFixed(2) + "%";
+                        document.getElementById("scarfRec").innerText  = scarfRec.toFixed(2) + "%";
+                        document.getElementById("scarfF1").innerText   = scarfF1.toFixed(2) + "%";
+                        document.getElementById("scarfAuc").innerText  = scarfAuc.toFixed(2) + "%";
+                        document.getElementById("baselineAcc").innerText = blAcc.toFixed(2) + "%";
+                        document.getElementById("baselineF1").innerText  = blF1.toFixed(2) + "%";
+                        document.getElementById("baselineAuc").innerText = blAuc.toFixed(2) + "%";
+                        document.getElementById("trainSamples").innerText = trainN;
+                        document.getElementById("testSamples").innerText  = testN;
+                    }
+                }
+            });
+        }
+
+    } catch (error) {
+        document.getElementById("status").innerText =
+            "❌ Error: " + error.message;
+        document.getElementById("bar").style.width = "0%";
+        console.error("Training error:", error);
+    }
+    
+    return false;
+}
+
+// ---------------- CHECK FRAUD ----------------
+
+document.getElementById('predictBtn').addEventListener('click', checkFraud);
+
+async function checkFraud() {
+    const file = document.getElementById('predictFile').files[0];
+    if (!file) { alert('Please select a CSV file to check.'); return; }
+
+    const status = document.getElementById('predictStatus');
+    status.style.display = 'block';
+    status.innerText = '🔄 Analyzing transactions...';
+    document.getElementById('predictSummary').style.display = 'none';
+    document.getElementById('predictTableWrap').style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const res = await fetch('http://127.0.0.1:8000/predict/', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.error) {
+            status.innerText = '❌ Error: ' + data.error;
+            return;
+        }
+
+        status.innerText = `✅ Done! Scanned ${data.total} transactions — ${data.fraud_count} fraud detected.`;
+        status.style.borderLeftColor = data.fraud_count > 0 ? '#ef4444' : '#10b981';
+
+        document.getElementById('totalTx').innerText    = data.total;
+        document.getElementById('fraudCount').innerText = data.fraud_count;
+        document.getElementById('legitCount').innerText = data.legit_count;
+        document.getElementById('predictSummary').style.display = 'block';
+
+        const table = document.getElementById('predictTable');
+        table.innerHTML = '<tr><th>#</th><th>Result</th><th>Fraud Probability</th><th>Confidence</th><th></th></tr>';
+
+        data.results.forEach(r => {
+            const isFraud = r.prediction.includes('FRAUD');
+            const rowColor = isFraud ? 'rgba(239,68,68,0.12)' : 'transparent';
+            const probColor = isFraud ? '#f87171' : '#34d399';
+            const rowId = 'obs-' + r.row;
+
+            // main row
+            const tr = document.createElement('tr');
+            tr.style.background = rowColor;
+
+            const whyBtn = isFraud
+                ? '<button type="button" onclick="toggleObs(\'' + rowId + '\')" style="padding:6px 14px;font-size:0.8em;background:rgba(239,68,68,0.3);box-shadow:none;">🔎 Why?</button>'
+                : '';
+
+            tr.innerHTML = '<td>' + r.row + '</td>' +
+                '<td style="font-weight:700;color:' + (isFraud ? '#f87171' : '#34d399') + '">' + r.prediction + '</td>' +
+                '<td style="color:' + probColor + '">' + r.fraud_probability + '%</td>' +
+                '<td>' + r.confidence + '%</td>' +
+                '<td>' + whyBtn + '</td>';
+            table.appendChild(tr);
+
+            // observation expandable row (only for fraud)
+            if (isFraud && r.observations) {
+                const obs = r.observations;
+                const flagsHtml = obs.flags.map(f =>
+                    '<div class="obs-flag">' +
+                    '<span class="flag-icon">⚠️</span>' +
+                    '<span class="flag-text">' + f.reason + '</span>' +
+                    '<span class="flag-dev">' + f.deviation + 'σ</span>' +
+                    '</div>'
+                ).join('');
+
+                const obsTr = document.createElement('tr');
+                obsTr.id = rowId;
+                obsTr.style.display = 'none';
+                obsTr.innerHTML = '<td colspan="5" style="padding:0 8px 8px 8px;border:none;">' +
+                    '<div class="obs-panel">' +
+                    '<div class="risk-badge">' + obs.risk_level + ' &nbsp;·&nbsp; Fraud Probability: ' + obs.fraud_probability + '%</div>' +
+                    '<div class="obs-summary">' + obs.summary + '</div>' +
+                    flagsHtml +
+                    '</div></td>';
+                table.appendChild(obsTr);
+            }
+        });
+        document.getElementById('predictTableWrap').style.display = 'block';
+
+    } catch (err) {
+        status.innerText = '❌ Error: ' + err.message;
+    }
+}
+
+function toggleObs(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+}
+
+// ---------------- LOAD HISTORY ----------------
+
+document.getElementById('historyBtn').addEventListener('click', loadHistory);
+
+async function loadHistory() {
+
+    const res = await fetch("http://127.0.0.1:8000/history/");
+    const data = await res.json();
+
+    let table = document.getElementById("historyTable");
+
+    table.innerHTML =
+        "<tr><th>Dataset</th><th>SCARF F1</th><th>SCARF AUC</th><th>Baseline F1</th><th>Baseline AUC</th><th>F1 Improvement</th></tr>";
+
+    data.forEach(exp => {
+        const f1Imp = (((exp.scarf_f1 || 0) - (exp.baseline_f1 || 0)) * 100).toFixed(2);
+        const impColor = f1Imp > 0 ? '#10b981' : '#ef4444';
+        table.innerHTML += `
+        <tr>
+            <td>${exp.dataset}</td>
+            <td>${((exp.scarf_f1||0)*100).toFixed(2)}%</td>
+            <td>${((exp.scarf_auc||0)*100).toFixed(2)}%</td>
+            <td>${((exp.baseline_f1||0)*100).toFixed(2)}%</td>
+            <td>${((exp.baseline_auc||0)*100).toFixed(2)}%</td>
+            <td style="color:${impColor};font-weight:bold">${f1Imp > 0 ? '+' : ''}${f1Imp}%</td>
+        </tr>`;
+    });
+}
+
+</script>
+
+</body>
+</html>
+```

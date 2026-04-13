@@ -1,0 +1,57 @@
+[
+    {
+        "dataset": "creditcard.csv",
+        "scarf_accuracy": 0.9935746638109617,
+        "scarf_precision": 0.19683257918552036,
+        "scarf_recall": 0.8877551020408163,
+        "scarf_f1": 0.32222222222222224,
+        "scarf_auc": 0.9564308647629001,
+        "baseline_accuracy": 0.9755275446789088,
+        "baseline_f1": 0.11435832274459974,
+        "baseline_auc": 0.9720834996210077
+    },
+    {
+        "dataset": "creditcard.csv",
+        "scarf_accuracy": 0.9851655489624662,
+        "scarf_precision": 0.09534127843986999,
+        "scarf_recall": 0.8979591836734694,
+        "scarf_f1": 0.17238001958863858,
+        "scarf_auc": 0.9483581664235757,
+        "baseline_accuracy": 0.9755275446789088,
+        "baseline_f1": 0.11435832274459974,
+        "baseline_auc": 0.9720834996210077
+    },
+    {
+        "dataset": "creditcard.csv",
+        "scarf_accuracy": 0.9952248867666164,
+        "scarf_precision": 0.25,
+        "scarf_recall": 0.8877551020408163,
+        "scarf_f1": 0.3901345291479821,
+        "scarf_auc": 0.9466854499959805,
+        "baseline_accuracy": 0.9755275446789088,
+        "baseline_f1": 0.11435832274459974,
+        "baseline_auc": 0.9720834996210077
+    },
+    {
+        "dataset": "creditcard.csv",
+        "scarf_accuracy": 0.9917839963484428,
+        "scarf_precision": 0.16117216117216118,
+        "scarf_recall": 0.8979591836734694,
+        "scarf_f1": 0.2732919254658385,
+        "scarf_auc": 0.965449518651017,
+        "baseline_accuracy": 0.9755275446789088,
+        "baseline_f1": 0.11435832274459974,
+        "baseline_auc": 0.9720834996210077
+    },
+    {
+        "dataset": "creditcard.csv",
+        "scarf_accuracy": 0.9948913310628138,
+        "scarf_precision": 0.23705722070844687,
+        "scarf_recall": 0.8877551020408163,
+        "scarf_f1": 0.3741935483870968,
+        "scarf_auc": 0.9614088178884385,
+        "baseline_accuracy": 0.9755275446789088,
+        "baseline_f1": 0.11435832274459974,
+        "baseline_auc": 0.9720834996210077
+    }
+]
